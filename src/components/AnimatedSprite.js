@@ -4,9 +4,10 @@ import React from 'react';
 import {
   Animated,
   PanResponder,
-  TouchableOpacity,
-  Image,
+  TouchableOpacity
 } from 'react-native';
+
+import FastImage from 'react-native-fast-image';
 
 import PropTypes from 'prop-types';
 
@@ -264,12 +265,13 @@ class AnimatedSprite extends React.Component {
           onPress={(evt) => this.handlePress(evt)}
           onPressIn={(evt) => this.handlePressIn(evt)}
           onPressOut={(evt) => this.handlePressOut(evt)}>
-          <Image
+          <FastImage
             source={this.sprite.frames[this.state.frameIndex]}
             style={{
               width: this.state.width,
               height: this.state.height,
             }}
+            resizeMode={FastImage.resizeMode.contain}
           />
         </TouchableOpacity>
       </Animated.View>
