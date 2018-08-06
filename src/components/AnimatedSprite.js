@@ -2,12 +2,14 @@
 
 import React from 'react';
 import {
-  Animated,
   PanResponder,
-  TouchableOpacity
+  TouchableOpacity,
+  View,
+  Image,
+  Platform
 } from 'react-native';
 
-import FastImage from 'react-native-fast-image';
+import WebImage from 'react-native-web-image';
 
 import PropTypes from 'prop-types';
 
@@ -15,17 +17,15 @@ import shallowCompare from 'react-addons-shallow-compare';
 import _ from 'lodash';
 import randomstring from 'random-string';
 
-import Tweens from "../Tweens/Tweens";
-
 class AnimatedSprite extends React.Component {
   constructor (props) {
     super(props);
 
     this.state = {
-      top: new Animated.Value(props.coordinates.top),
-      left: new Animated.Value(props.coordinates.left),
-      scale: new Animated.Value(1),
-      opacity: new Animated.Value(props.opacity),
+      top: props.coordinates.top,
+      left: props.coordinates.left,
+      scale: 1,
+      opacity: props.opacity,
       width: props.size.width,
       height: props.size.height,
       rotate: props.rotate,
@@ -65,6 +65,19 @@ class AnimatedSprite extends React.Component {
       this.startTween();
     }
     this.fps = this.props.fps || this.fps;
+  }
+
+  componentWillReceiveProps (newProps) {
+    this.setState({
+      top: newProps.coordinates.top,
+      left: newProps.coordinates.left,
+      scale: 1,
+      opacity: newProps.opacity,
+      width: newProps.size.width,
+      height: newProps.size.height,
+      rotate: newProps.rotate,
+      frameIndex: newProps.animationFrameIndex
+    });
   }
 
   shouldComponentUpdate (nextProps, nextState) {
@@ -161,74 +174,8 @@ class AnimatedSprite extends React.Component {
     }, 1000 / this.fps);
   }
 
-  // notify parent that tween has ended
-  tweenCompleted (spriteUID) {
-    if (this.props.onTweenFinish) {
-      this.props.onTweenFinish(spriteUID);
-    }
-  }
-
-  // meant to be used from instance of AnimatedSprite. User would invoke
-  // this.refs.<refname>.tweenSprite. This allows for programatic contorl
-  // of starting tween
-  tweenSprite () {
-    if (this.props.tweenStart !== 'fromMethod') return 0;
-    this.startTween();
-  }
-
-  startTween () {
-    const tweenOptions = this.props.tweenOptions;
-    const tweenType = this.props.tweenOptions.tweenType;
-    Tweens[tweenType].start(tweenOptions,
-      this.tweenablValues,
-      () => this.tweenCompleted(this.props.spriteUID),
-    );
-  }
-
   getCoordinates () {
     return { top: this.state.top._value, left: this.state.left._value};
-  }
-
-  handlePress (e) {
-    e.preventDefault();
-    if (this.props.onPress) {
-      this.props.onPress(this.props.spriteUID);
-    }
-    if (this.props.tweenStart === 'fromPress') {
-      this.startTween();
-    }
-  }
-
-  stoppedTween (stopValues) {
-    if (this.props.onTweenStopped) {
-      this.props.onTweenStopped(stopValues);
-    }
-  }
-  
-  stopTween () {
-    // 
-    const tweenType = this.props.tweenOptions.tweenType;
-    Tweens[tweenType].stop(this.tweenablValues,
-      (stopValues) => this.stoppedTween(stopValues));
-  }
-
-  handlePressIn () {
-    if (this.props.onPressIn) {
-      this.props.onPressIn();
-    }
-
-    if (this.props.stopAutoTweenOnPressIn) {
-      const tweenType = this.props.tweenOptions.tweenType;
-      Tweens[tweenType].stop(this.tweenablValues,
-        (stopValues) => this.stoppedTween(stopValues));
-    }
-  }
-
-  handlePressOut () {
-    // e.preventDefault();
-    if (this.props.onPressOut) {
-      this.props.onPressOut();
-    }
   }
 
   getStyle () {
@@ -254,18 +201,14 @@ class AnimatedSprite extends React.Component {
 
   render () {
     return (
-      <Animated.View
+      <View
         {...this.panResponder.panHandlers}
         style={this.getStyle()}
         ref={(sprite) => {
           this.spriteComponentRef = sprite;
         }}>
-        <TouchableOpacity
-          activeOpacity={1.0}
-          onPress={(evt) => this.handlePress(evt)}
-          onPressIn={(evt) => this.handlePressIn(evt)}
-          onPressOut={(evt) => this.handlePressOut(evt)}>
-          <FastImage
+          {Platform.OS === 'ios' ? (
+            <Image
             source={this.sprite.frames[this.state.frameIndex]}
             style={{
               width: this.state.width,
@@ -273,8 +216,16 @@ class AnimatedSprite extends React.Component {
             }}
             resizeMode={FastImage.resizeMode.contain}
           />
-        </TouchableOpacity>
-      </Animated.View>
+          ) :(
+            <WebImage
+            source={this.sprite.frames[this.state.frameIndex]}
+            style={{
+              width: this.state.width,
+              height: this.state.height,
+            }}
+          />
+          )}
+      </View>
     );
   }
 }
