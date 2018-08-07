@@ -214,7 +214,7 @@ class AnimatedSprite extends React.Component {
               width: this.state.width,
               height: this.state.height,
             }}
-            resizeMode={FastImage.resizeMode.contain}
+            resizeMode="contain"
           />
           ) :(
             <WebImage
