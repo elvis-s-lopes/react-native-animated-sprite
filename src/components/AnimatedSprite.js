@@ -200,6 +200,21 @@ class AnimatedSprite extends React.Component {
   }
 
   render () {
+    let imageObject = {};
+    if (Platform.OS === 'android') {
+      let imageObject = Image.resolveAssetSource(this.sprite.frames[this.state.frameIndex]);
+      if (imageObject.uri) {
+        if (!imageObject.uri.startsWith('http')) {    
+          if (!(/\.(gif|jpg|jpeg|tiff|png|webp)$/i).test(imageObject.uri)) {
+            imageObject = { uri: 'file:///android_asset/' + imageObject.uri + '.png' };
+          } else {
+            imageObject = { uri: 'file:///android_asset/' + imageObject.uri };
+          }
+        }
+      } else {
+        imageObject = { uri: '' };
+      }
+    }
     return (
       <View
         {...this.panResponder.panHandlers}
@@ -218,7 +233,7 @@ class AnimatedSprite extends React.Component {
           />
           ) :(
             <WebImage
-            source={this.sprite.frames[this.state.frameIndex]}
+            source={imageObject}
             style={{
               width: this.state.width,
               height: this.state.height,
