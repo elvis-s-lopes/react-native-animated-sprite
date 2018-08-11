@@ -17,6 +17,11 @@ import shallowCompare from 'react-addons-shallow-compare';
 import _ from 'lodash';
 import randomstring from 'random-string';
 
+String.prototype.replaceAll = function(search, replacement) {
+  var target = this;
+  return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 class AnimatedSprite extends React.Component {
   constructor (props) {
     super(props);
@@ -204,7 +209,8 @@ class AnimatedSprite extends React.Component {
     if (Platform.OS === 'android') {
       let imageObject = Image.resolveAssetSource(this.sprite.frames[this.state.frameIndex]);
       if (imageObject.uri) {
-        if (!imageObject.uri.startsWith('http')) {    
+        if (!imageObject.uri.startsWith('http')) {
+          imageObject.uri = imageObject.uri.replaceAll('_','/');
           if (!(/\.(gif|jpg|jpeg|tiff|png|webp)$/i).test(imageObject.uri)) {
             imageObject = { uri: 'file:///android_asset/' + imageObject.uri + '.png' };
           } else {
