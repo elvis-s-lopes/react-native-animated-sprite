@@ -209,7 +209,7 @@ class AnimatedSprite extends React.Component {
     if (Platform.OS === 'android') {
       let imageObject = Image.resolveAssetSource(this.sprite.frames[this.state.frameIndex]);
       if (imageObject.uri) {
-        if (!imageObject.uri.startsWith('http')) {
+        if (!imageObject.uri.startsWith('http:/') && !imageObject.uri.startsWith('https:/') && !imageObject.uri.startsWith('file:/')) {
           imageObject.uri = imageObject.uri.replaceAll('_','/');
           if (!(/\.(gif|jpg|jpeg|tiff|png|webp)$/i).test(imageObject.uri)) {
             imageObject = { uri: 'file:///android_asset/' + imageObject.uri + '.png' };
