@@ -206,30 +206,46 @@ class AnimatedSprite extends React.Component {
 
   render () {
     let imageObject = {};
-    if (Platform.OS === 'android') {
-      let imageObject = Image.resolveAssetSource(this.sprite.frames[this.state.frameIndex]);
-      if (imageObject.uri) {
-        if (!imageObject.uri.startsWith('http:/') && !imageObject.uri.startsWith('https:/') && !imageObject.uri.startsWith('file:/')) {
-          imageObject.uri = imageObject.uri.replaceAll('_','/');
-          if (!(/\.(gif|jpg|jpeg|tiff|png|webp)$/i).test(imageObject.uri)) {
-            imageObject = { uri: 'file:///android_asset/' + imageObject.uri + '.png' };
+    try {
+      if (Platform.OS === 'android') {
+        // console.log('#####1 imageObject: ', this.sprite.frames[this.state.frameIndex]);
+        imageObject = Image.resolveAssetSource(this.sprite.frames[this.state.frameIndex]);
+        // console.log('#####2 imageObject: ', imageObject);
+        if (imageObject) {
+          // console.log('#####3 imageObject: ', imageObject);
+          if (imageObject.uri) {
+            // console.log('#####4 imageObject: ', imageObject);
+            if (!imageObject.uri.startsWith('http:/') && !imageObject.uri.startsWith('https:/') && !imageObject.uri.startsWith('file:/')) {
+              // console.log('#####5 imageObject: ', imageObject);
+              imageObject.uri = imageObject.uri.replaceAll('_','/');
+              // console.log('#####6 imageObject: ', imageObject);
+              if (!(/\.(gif|jpg|jpeg|tiff|png|webp)$/i).test(imageObject.uri)) {
+                // console.log('#####7 imageObject: ', imageObject);
+                imageObject = { uri: 'file:///android_asset/' + imageObject.uri + '.webp' };
+                // console.log('#####8 imageObject: ', imageObject);
+              } else {
+                // console.log('#####9 imageObject: ', imageObject);
+                imageObject = { uri: 'file:///android_asset/' + imageObject.uri };
+                // console.log('#####10 imageObject: ', imageObject);
+              }
+            }
           } else {
-            imageObject = { uri: 'file:///android_asset/' + imageObject.uri };
+            imageObject = null;
           }
+        } else {
+          imageObject = null;
         }
-      } else {
-        imageObject = { uri: '' };
       }
+    } catch(e) {
+      console.log('## Error react-native-animated-sprite: ', e);
+      imageObject = null;
     }
-    return (
-      <View
-        {...this.panResponder.panHandlers}
-        style={this.getStyle()}
-        ref={(sprite) => {
-          this.spriteComponentRef = sprite;
-        }}>
-          {Platform.OS === 'ios' ? (
-            <Image
+    // console.log('#####100 imageObject: ', imageObject);
+    let showControl = [];
+    if (imageObject !== null) {
+      if (Platform.OS === 'ios') {
+        showControl.push (
+          <Image
             source={this.sprite.frames[this.state.frameIndex]}
             style={{
               width: this.state.width,
@@ -237,15 +253,28 @@ class AnimatedSprite extends React.Component {
             }}
             resizeMode="contain"
           />
-          ) :(
-            <WebImage
+        );
+      } else {
+        showControl.push (
+          <WebImage
             source={imageObject}
             style={{
               width: this.state.width,
               height: this.state.height,
             }}
           />
-          )}
+        );
+      }
+    }
+
+    return (
+      <View
+        {...this.panResponder.panHandlers}
+        style={this.getStyle()}
+        ref={(sprite) => {
+          this.spriteComponentRef = sprite;
+        }}>
+        {showControl}
       </View>
     );
   }
@@ -295,4 +324,3 @@ AnimatedSprite.defaultProps = {
 };
 
 export default AnimatedSprite;
-
