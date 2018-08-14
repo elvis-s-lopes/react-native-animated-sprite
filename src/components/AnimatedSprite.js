@@ -246,6 +246,7 @@ class AnimatedSprite extends React.Component {
       if (Platform.OS === 'ios') {
         showControl.push (
           <Image
+            key={`ImageIos`}
             source={this.sprite.frames[this.state.frameIndex]}
             style={{
               width: this.state.width,
@@ -257,6 +258,7 @@ class AnimatedSprite extends React.Component {
       } else {
         showControl.push (
           <WebImage
+            key={`WebImageAndroid`}
             source={imageObject}
             style={{
               width: this.state.width,
