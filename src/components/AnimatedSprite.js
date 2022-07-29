@@ -257,7 +257,7 @@ class AnimatedSprite extends React.Component {
         );
       } else {
         showControl.push (
-          <WebImage
+          <Image
             key={`WebImageAndroid`}
             source={imageObject}
             style={{
