@@ -26,6 +26,6 @@
     "random-string": "^0.1.2",
     "react-addons-shallow-compare": "^15.5.2",
     "prop-types": "^15.5.10",
-    "react-native-web-image": "0.0.6"
+    "react-native-web-image": "0.0.5"
   }
 }
