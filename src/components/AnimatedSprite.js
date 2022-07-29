@@ -9,7 +9,6 @@ import {
   Platform
 } from 'react-native';
 
-import WebImage from 'react-native-web-image';
 
 import PropTypes from 'prop-types';
 
